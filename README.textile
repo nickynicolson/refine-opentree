@@ -1,37 +1,27 @@
-h1. refine-stats
+h1. refine-opentree
 
-A extension for Google Refine to compute elementary statistics.
+A extension for Google Refine to display phylogenetic trees from the OpenTreeOfLife.
 
 h2. Installation
 
-Run Google Refine. On the starting page click the "Browse workspace directory" link in the lower left corner. Make a folder called "extensions" within the the window that pops up.  Copy the stats folder into the extensions folder.  The final path should be:
-
-<pre>
-/PATH/TO/Google/Refine/extensions/stats/...
-</pre>
+Copy the opentree folder into the extensions folder of your Google Refine installation. (Note that it may be lost during upgrades - work in progress).
 
 Restart Google Refine.
 
-(Alternatively, you copy the stats folder into the extensions folder of your Google Refine installation, but it may be lost during upgrades.)
-
 h2.  Usage
 
-Select "Column statistics" from the drop-down menu of any column header.  Statistics will be calculated based on *filtered rows*, so you can facet your dataset in different ways and calculate statistics for each subset.
+Select "Opentree" from the drop-down menu of the column which contains opentree taxonomy IDs (AKA "ott" IDs). These will be passed to the OpenTree API to request a Newick format induced subtree, which is displayed using D3.
+The induced subtree is calculated based on the current set of filtered rows, so you can facet your dataset in different ways and display phylogenetic trees for each subset.
 
 h2. Build it yourself
 
-WARNING: THIS IS NOT REALLY TESTED WE WILL ADD BETTER INSTRUCTIONS SOON.
-
-If you modify this extension, you can build by changing into the stats directoy and executing a command such as:
-
-ant -Drefine.dir=/Users/YOU/src/google-refine/main -Dserver.lib.dir=/Users/YOU/src/google-refine/server/lib build
+Assuming you have installed the "opentree" folder into your Google Refine extensions directory, execute "ant" from there and the extension will be recompiled and repackaged. You will need to restart oogle Refine for any changes to take affect.
 
 h2. Credits
 
-refine-stats is a "Newsapps":http://apps.chicagotribune.com/ project. Development by "Joe Germuska":https://github.com/joegermuska and "Christopher Groskopf":https://github.com/bouvard.
+The refine-opentree extension was developed as part of the TreeForAll hackathon, Sept 15-19th 2014, supported by OpenTreeOfLife, Arbor and NESCent HIP.  
+refine-opentree is based on the sample extension "refine-stats":https://github.com/newsapps/refine-stats developed by "Joe Germuska":https://github.com/joegermuska and "Christopher Groskopf":https://github.com/bouvard as part of the "Newsapps":http://apps.chicagotribune.com/ team at the Chicago Tribune.
 
 h2. License
 
 MIT.
-
-Note: refine-stats includes the "Apache Commons Math":http://commons.apache.org/math/ library, which is licensed under the Apache Software License.  A copy of this license can be found in /stats/module/MOD-INF/lib/. 
