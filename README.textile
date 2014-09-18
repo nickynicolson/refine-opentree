@@ -15,7 +15,7 @@ The induced subtree is calculated based on the current set of filtered rows, so 
 
 h2. Build it yourself
 
-Assuming you have installed the "opentree" folder into your Google Refine extensions directory, execute "ant" from there and the extension will be recompiled and repackaged. You will need to restart oogle Refine for any changes to take affect.
+Assuming you have installed the "opentree" folder into your Google Refine extensions directory, execute "ant" from there and the extension will be recompiled and repackaged. You will need to restart Google Refine for any changes to take affect.
 
 h2. Credits
 
