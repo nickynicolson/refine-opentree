@@ -1,15 +1,15 @@
 #*
- * Access this page at the URL /extensions/stats/
+ * Access this page at the URL /extensions/opentree/
  *#
 <html>
   <head>
-    <title>Stats Extension</title>
+    <title>Opentree Extension</title>
   </head>
   <body>
-    <h1>Stats Extension</h1>
+    <h1>Opentree Extension</h1>
     
     <p>
-        Yo.
+        Hello.
     </p>
   </body>
 </html>

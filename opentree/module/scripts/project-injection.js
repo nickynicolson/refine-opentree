@@ -2,26 +2,27 @@ var StatsExtension = {};
 
 DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
     var doStatsDialog = function(response) {
-        var dialog = $(DOM.loadHTML("stats", "scripts/stats-dialog.html"));
+    	/* WIRING */
+    	console.log("in doStatsDialog");
+        var dialog = $(DOM.loadHTML("opentree", "scripts/stats-dialog.html"));
     
         var elmts = DOM.bind(dialog);
-        elmts.dialogHeader.text("Statistics for column \"" + column.name + "\"");
+        elmts.dialogHeader.text("Opentree induced sub-tree from Google Refine data");
 
-        if (response["count"]) { elmts.dialogCount.text(response["count"]); 
-        if (response["sum"]) { elmts.dialogSum.text(response["sum"]); }}
-        if (response["min"]) { elmts.dialogMin.text(response["min"]); }
-        if (response["max"]) { elmts.dialogMax.text(response["max"]); }
-        if (response["mean"]) { elmts.dialogMean.text(response["mean"]); }
-        if (response["median"]) { elmts.dialogMedian.text(response["median"]); }
-        if (response["mode"]) { elmts.dialogMode.text(response["mode"]); }
-        if (response["stddev"]) { elmts.dialogStdDev.text(response["stddev"]); }
-        if (response["variance"]) { elmts.dialogVariance.text(response["variance"]); }
-
+        //if (response["ottIds"]) { elmts.dialogIds.text(response["ottIds"]); }
+        
+        if (response["newick"]) { 
+        	elmts.dialogNewick.text(response["newick"]);
+        	console.log(response["newick"]);
+        	console.log('set newickstr');        	
+        }
+        
         var level = DialogSystem.showDialog(dialog);
 
         elmts.okButton.click(function() {
             DialogSystem.dismissUntil(level - 1);
-        }); 
+        });
+        console.log('done doStatsDialog');
     };
 
     var prepStatsDialog = function() { 
@@ -33,10 +34,11 @@ DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
                 doStatsDialog(response);
             }
         }
-
+        console.log("in prepStatsDialog");
+        /* WIRING */
         Refine.postProcess(
-            "stats",
-            "summarize",
+            "opentree",
+            "subtree",
             params,
             body,
             updateOptions,
@@ -48,8 +50,8 @@ DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
         menu,
         [ "core/edit-column" ],
         {
-            id: "stats/summarize",
-            label: "Column statistics",
+            id: "opentree/subtree",
+            label: "Opentree",
             click: prepStatsDialog 
         }
     );

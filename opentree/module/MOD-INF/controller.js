@@ -7,7 +7,8 @@ var ClientSideResourceManager = Packages.com.google.refine.ClientSideResourceMan
  */
 function init() {
     var RS = Packages.com.google.refine.RefineServlet;
-    RS.registerCommand(module, "summarize", new Packages.com.tribapps.refine.stats.Summarize());
+    /* WIRING */
+    RS.registerCommand(module, "subtree", new Packages.org.opentree.refine.SubTree());
     
     // Script files to inject into /project page
     ClientSideResourceManager.addPaths(
@@ -15,6 +16,10 @@ function init() {
         module,
         [
             "scripts/project-injection.js"
+            , "scripts/js/d3.min.js"
+            , "scripts/js/d3.layout.min.js"
+            , "scripts/js/d3.phylogram.js"
+            , "scripts/js/newick.js"
         ]
     );
     
@@ -43,4 +48,3 @@ function process(path, request, response) {
 function send(request, response, template, context) {
     butterfly.sendTextFromTemplate(request, response, context, template, encoding, html);
 }
-
