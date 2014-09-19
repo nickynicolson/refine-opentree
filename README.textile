@@ -19,8 +19,10 @@ Assuming you have installed the "opentree" folder into your Google Refine extens
 
 h2. Credits
 
-The refine-opentree extension was developed as part of the TreeForAll hackathon, Sept 15-19th 2014, supported by OpenTreeOfLife, Arbor and NESCent HIP.  
+The refine-opentree extension was developed as part of the TreeForAll hackathon, Sept 15-19th 2014, supported by "Open Tree of Life":http://opentreeoflife.org, "Arbor":http://www.arborworkflows.com/ and "NESCent HIP":http://www.evoio.org/wiki/HIP.  
 refine-opentree is based on the sample extension "refine-stats":https://github.com/newsapps/refine-stats developed by "Joe Germuska":https://github.com/joegermuska and "Christopher Groskopf":https://github.com/bouvard as part of the "Newsapps":http://apps.chicagotribune.com/ team at the Chicago Tribune.
+
+The visualisation was developed with reference to examples developed by "Jason Davies":http://www.jasondavies.com/tree-of-life and "kueda":http://bl.ocks.org/kueda/1036776.
 
 h2. License
 
