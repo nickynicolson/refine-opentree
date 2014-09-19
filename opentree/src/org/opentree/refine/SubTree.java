@@ -1,40 +1,47 @@
-package com.tribapps.refine.stats;
+package org.opentree.refine;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 
-import com.google.refine.commands.Command;
 import com.google.refine.ProjectManager;
-import com.google.refine.model.Project;
-import com.google.refine.model.ColumnModel;
-import com.google.refine.model.Column;
-import com.google.refine.model.Row;
 import com.google.refine.browsing.Engine;
 import com.google.refine.browsing.FilteredRows;
 import com.google.refine.browsing.RowVisitor;
+import com.google.refine.commands.Command;
+import com.google.refine.model.Column;
+import com.google.refine.model.ColumnModel;
+import com.google.refine.model.Project;
+import com.google.refine.model.Row;
 import com.google.refine.util.ParsingUtilities;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.descriptive.rank.Median;
-
-public class Summarize extends Command {
-    protected RowVisitor createRowVisitor(Project project, int cellIndex, List<Float> values) throws Exception {
+public class SubTree extends Command {
+    protected RowVisitor createRowVisitor(Project project, int cellIndex, List<Long> values) throws Exception {
         return new RowVisitor() {
             int cellIndex;
-            List<Float> values;
+            List<Long> values;
             
-            public RowVisitor init(int cellIndex, List<Float> values) {
+            public RowVisitor init(int cellIndex, List<Long> values) {
                 this.cellIndex = cellIndex;
                 this.values = values;
                 return this;
@@ -52,9 +59,11 @@ public class Summarize extends Command {
             
             public boolean visit(Project project, int rowIndex, Row row) {
                 try {
-                    Number val = (Number)row.getCellValue(this.cellIndex);
-                    this.values.add(val.floatValue());
+                    Long val = (Long)row.getCellValue(this.cellIndex);
+                    this.values.add(val);
                 } catch (Exception e) {
+                	System.out.println("Error in getting value from index[" + this.cellIndex + "], value: " + row.getCellValue(this.cellIndex));
+                	e.printStackTrace();
                 }
 
                 return false;
@@ -75,7 +84,7 @@ public class Summarize extends Command {
             Column column = columnModel.getColumnByName(request.getParameter("column_name"));
             int cellIndex = column.getCellIndex();
 
-            List<Float> values = new ArrayList<Float>();
+            List<Long> values = new ArrayList<Long>();
 
             Engine engine = new Engine(project);
             JSONObject engineConfig = null;
@@ -91,7 +100,7 @@ public class Summarize extends Command {
             FilteredRows filteredRows = engine.getAllFilteredRows();
             filteredRows.accept(project, createRowVisitor(project, cellIndex, values));
             
-            HashMap map = computeStatistics(values);
+            HashMap map = computeSubtree(values);
             JSONWriter writer = new JSONWriter(response.getWriter());
 
             writer.object();
@@ -110,70 +119,32 @@ public class Summarize extends Command {
         }
     };
 
-    public HashMap computeStatistics(List<Float> values) {
+    public HashMap computeSubtree(List<Long> values) {
         HashMap map = new HashMap();
         HashMap<Float, Integer> modeMap = new HashMap<Float, Integer>();
-        DescriptiveStatistics stats = new DescriptiveStatistics();
 
-        for (Float f : values) {
-            stats.addValue(f);
-            
-            Integer current = modeMap.get(f);
-            if (current == null) {
-                modeMap.put(f, new Integer(1));
-            } else {
-                modeMap.put(f, current + 1);
-            }
-        }
-
-        Float mode = null;
-        Integer high = -1;
-
-        for (Iterator<Map.Entry<Float,Integer>> entries = modeMap.entrySet().iterator(); entries.hasNext();) {
-            Map.Entry<Float,Integer> entry = entries.next();
-            if (entry.getValue() > high) {
-                mode = entry.getKey();
-                high = entry.getValue();
-            }
-        }
-
-        if (!(Double.isNaN(stats.getN()))) {
-            map.put("count", stats.getN());
+        // Send the ottids to the web service to get an induced subtree:
+        HttpClient client = new DefaultHttpClient();
+        HttpPost post = new HttpPost("http://api.opentreeoflife.org/v2/tree_of_life/induced_subtree");
+        try {
+          List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+          post.setEntity(new StringEntity("{\"ott_ids\":" + Arrays.toString(values.toArray()) + "}"));
+          StringBuffer sb = new StringBuffer();
+          HttpResponse response = client.execute(post);
+          BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+          String line = "";
+          while ((line = rd.readLine()) != null) {
+            sb.append(line);
+          }
+          String jsonResponse = sb.toString();
+          System.out.println(jsonResponse);
+          org.json.JSONObject o = new JSONObject(jsonResponse);
+          map.put("newick", o.get("subtree"));
+        } catch (Exception e) {
+          e.printStackTrace();
         }
         
-        if (!(Double.isNaN(stats.getSum()))) {
-            map.put("sum", stats.getSum());
-        }
-
-        if (!(Double.isNaN(stats.getMin()))) {
-            map.put("min", stats.getMin());
-        }
-
-        if (!(Double.isNaN(stats.getMax()))) {
-            map.put("max", stats.getMax());
-        }
-
-        if (!(Double.isNaN((stats.getMean())))) {
-            map.put("mean", stats.getMean());
-        }
-
-        if (!(Double.isNaN((stats.apply(new Median()))))) {
-            map.put("median", stats.apply(new Median()));
-        }
-
-        if (mode != null) {
-            map.put("mode", mode);
-        }
-
-        if (!(Double.isNaN((stats.getStandardDeviation())))) {
-            map.put("stddev", stats.getStandardDeviation());
-        }
-        
-        if (!(Double.isNaN((stats.getVariance())))) {
-            map.put("variance", stats.getVariance());
-        }
-
+        map.put("ottIds", Arrays.toString(values.toArray()));
         return map;
     }
 }
-
