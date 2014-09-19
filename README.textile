@@ -1,6 +1,7 @@
 h1. refine-opentree
 
 A extension for Google Refine to display phylogenetic trees from the OpenTreeOfLife.
+Developed with Version 2.5 [r2407].
 
 h2. Installation
 
