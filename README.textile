@@ -10,7 +10,7 @@ Restart Google Refine.
 
 h2.  Usage
 
-Select "Opentree" from the drop-down menu of the column which contains opentree taxonomy IDs (AKA "ott" IDs). For details about how to apply ott_ids to your data see the "wiki":https://github.com/nickynicolson/refine-opentree/wiki. These will be passed to the OpenTree API to request a Newick format induced subtree, which is displayed using D3.
+Select "Opentree" from the drop-down menu of the column which contains opentree taxonomy IDs (AKA "ott" IDs). For details about how to apply ott_ids to your data see the "wiki":https://github.com/nickynicolson/refine-opentree/wiki. (The subdirectory opentree-utils includes a Jython script to help application of ott_ids to data in Google Refine). These will be passed to the OpenTree API to request a Newick format induced subtree, which is displayed using D3.
 The induced subtree is calculated based on the current set of filtered rows, so you can facet your dataset in different ways and display phylogenetic trees for each subset.
 
 h2. Build it yourself
