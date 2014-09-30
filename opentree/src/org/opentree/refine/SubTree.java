@@ -59,7 +59,15 @@ public class SubTree extends Command {
             
             public boolean visit(Project project, int rowIndex, Row row) {
                 try {
-                    Long val = (Long)row.getCellValue(this.cellIndex);
+                    Long val = null;
+                    Object value = row.getCellValue(this.cellIndex);
+                    if (value instanceof Integer) {
+                        val = ((Integer) value).longValue();
+                    } else if (value instanceof String) {
+                        val = Long.parseLong((String) value);
+                    } else {
+                        val = (Long) value;
+                    }
                     this.values.add(val);
                 } catch (Exception e) {
                 	System.out.println("Error in getting value from index[" + this.cellIndex + "], value: " + row.getCellValue(this.cellIndex));
@@ -128,7 +136,9 @@ public class SubTree extends Command {
         HttpPost post = new HttpPost("http://api.opentreeoflife.org/v2/tree_of_life/induced_subtree");
         try {
           List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-          post.setEntity(new StringEntity("{\"ott_ids\":" + Arrays.toString(values.toArray()) + "}"));
+          String ids = "{\"ott_ids\":" + Arrays.toString(values.toArray()) + "}";
+          System.out.println(ids);
+          post.setEntity(new StringEntity(ids));
           StringBuffer sb = new StringBuffer();
           HttpResponse response = client.execute(post);
           BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
